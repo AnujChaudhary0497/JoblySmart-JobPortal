@@ -1,0 +1,10 @@
+// tsconfig.json (and tsconfig.app.json)
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+    // ... other options
+  }
+}
