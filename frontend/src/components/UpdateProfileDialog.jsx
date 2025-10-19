@@ -69,8 +69,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
-    } finally{
+      toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
       setLoading(false);
     }
     setOpen(false);
@@ -81,97 +81,87 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     <div>
       <Dialog open={open}>
         <DialogContent
-          className="sm:max-w-[425px]"
+          className="sm:max-w-[425px] rounded-lg shadow-lg"
           onInteractOutside={() => setOpen(false)}
         >
           <DialogHeader>
-            <DialogTitle>Update Profile</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold text-gray-800">
+              Update Profile
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={submitHandler}>
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-6 py-4">
+              {[
+                {
+                  label: "Name",
+                  id: "fullname",
+                  type: "text",
+                  value: input.fullname,
+                },
+                {
+                  label: "Email",
+                  id: "email",
+                  type: "email",
+                  value: input.email,
+                },
+                {
+                  label: "Contact:",
+                  id: "phoneNumber",
+                  type: "text",
+                  value: input.phoneNumber,
+                },
+                { label: "Bio", id: "bio", type: "text", value: input.bio },
+                {
+                  label: "Skills",
+                  id: "skills",
+                  type: "text",
+                  value: input.skills,
+                },
+              ].map(({ label, id, type, value }) => (
+                <div key={id} className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor={id}
+                    className="text-right font-medium text-gray-700"
+                  >
+                    {label}
+                  </Label>
+                  <Input
+                    id={id}
+                    name={id}
+                    type={type}
+                    value={value}
+                    onChange={changeEventHandler}
+                    className="col-span-3 rounded-md border border-gray-300 px-3 py-2 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6A38C2] focus:border-transparent transition"
+                  />
+                </div>
+              ))}
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input
-                  id="fullname"
-                  name="fullname"
-                  type="text"
-                  value={input.fullname}
-                  onChange={changeEventHandler}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={input.email}
-                  onChange={changeEventHandler}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="number" className="text-right">
-                  Number
-                </Label>
-                <Input
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={input.phoneNumber}
-                  onChange={changeEventHandler}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="bio" className="text-right">
-                  Bio
-                </Label>
-                <Input
-                  id="bio"
-                  name="bio"
-                  value={input.bio}
-                  onChange={changeEventHandler}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="skills" className="text-right">
-                  Skills
-                </Label>
-                <Input
-                  id="skills"
-                  name="skills"
-                  value={input.skills}
-                  onChange={changeEventHandler}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="file" className="text-right">
+                <Label
+                  htmlFor="file"
+                  className="text-right font-medium text-gray-700"
+                >
                   File
                 </Label>
                 <Input
                   id="file"
                   name="file"
                   type="file"
-                  accept="application/pdf"                
+                  accept="application/pdf"
                   onChange={fileChangeHandler}
-                  className="col-span-3"
+                  className="col-span-3 rounded-md border border-gray-300 px-3 py-2 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6A38C2] focus:border-transparent transition"
                 />
               </div>
             </div>
             <DialogFooter>
               {loading ? (
-                <Button className="w-full my-4">
+                <Button className="w-full my-4 bg-gradient-to-r from-[#6A38C2] to-[#F83002] text-white shadow-lg hover:from-[#542c9e] hover:to-[#c1271e] transition">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
                 </Button>
               ) : (
-                <Button type="submit" className="w-full my-4">
+                <Button
+                  type="submit"
+                  className="w-full my-4 bg-gradient-to-r from-[#6A38C2] to-[#F83002] text-white shadow-lg hover:from-[#542c9e] hover:to-[#c1271e] transition"
+                >
                   Update
                 </Button>
               )}

@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Popover, PopoverTrigger } from "../ui/popover";
-import { PopoverContent } from "@radix-ui/react-popover";
+import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { LogOutIcon, User2 } from "lucide-react";
@@ -18,44 +17,79 @@ const Navbar = () => {
 
   const logoutHandler = async () => {
     try {
-      const res = await axios.get(`${USER_API_END_POINT}/logout`,{withCredentials:true});
-      if(res.data.success){
+      const res = await axios.get(`${USER_API_END_POINT}/logout`, {
+        withCredentials: true,
+      });
+      if (res.data.success) {
         dispatch(setUser(null));
         navigate("/");
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Logout failed");
     }
   };
+
   return (
-    <div className="bg-white">
-      <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
-        <div>
-          <h1 className="text-2xl font-bold">
-            Job<span className="text-[#F83002]">Portal</span>
+    <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm transition-all border-b border-gray-200">
+      <div className="flex items-center justify-between mx-auto max-w-7xl h-16 px-4">
+        
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-1">
+          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#F83002] to-[#6A38C2] bg-clip-text text-transparent">
+            JoblySmart
           </h1>
-        </div>
-        <div className="flex items-center gap-12">
-          <ul className="flex font-medium items-center gap-5">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/jobs">Jobs</Link>
-            </li>
-            <li>
-              <Link to="/browse">Browse</Link>
-            </li>
+        </Link>
+
+        <div className="flex items-center gap-10">
+          
+          {/* Nav Links */}
+          <ul className="flex font-medium items-center gap-8 text-gray-700">
+            {user && user.role === "recruiter" ? (
+              <>
+                <li className="group relative">
+                  <Link to="/admin/companies" className="transition hover:text-[#6A38C2]">
+                    Companies
+                  </Link>
+                  <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-[#6A38C2] transition-all duration-300 group-hover:w-full"></span>
+                </li>
+                <li className="group relative">
+                  <Link to="/admin/jobs" className="transition hover:text-[#6A38C2]">
+                    Jobs
+                  </Link>
+                  <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-[#6A38C2] transition-all duration-300 group-hover:w-full"></span>
+                </li>
+              </>
+            ) : (
+              <>
+                {["Home", "Jobs", "Browse"].map((item, i) => (
+                  <li key={i} className="group relative">
+                    <Link
+                      to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                      className="transition hover:text-[#6A38C2]"
+                    >
+                      {item}
+                    </Link>
+                    <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-[#6A38C2] transition-all duration-300 group-hover:w-full"></span>
+                  </li>
+                ))}
+              </>
+            )}
           </ul>
+
+          {/* Auth Section */}
           {!user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link to="/login">
-                <Button variant="outline">Login</Button>
+                <Button
+                  variant="outline"
+                  className="hover:border-[#6A38C2] hover:text-[#6A38C2] transition-all"
+                >
+                  Login
+                </Button>
               </Link>
               <Link to="/signup">
-                <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">
+                <Button className="bg-gradient-to-r from-[#6A38C2] to-[#F83002] hover:brightness-110 text-white shadow-md transition-all">
                   Signup
                 </Button>
               </Link>
@@ -63,44 +97,41 @@ const Navbar = () => {
           ) : (
             <Popover>
               <PopoverTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage
-                    src={user?.profile?.profilePhoto}
-                    alt="@shadcn"
-                  />
+                <Avatar className="cursor-pointer ring-2 ring-[#6A38C2] ring-offset-2 hover:ring-offset-4 transition-all">
+                  <AvatarImage src={user?.profile?.profilePhoto} alt="profile" />
                 </Avatar>
               </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="">
-                  <div className="flex gap-2 space-y-2">
-                    <Avatar className="cursor-pointer">
-                      <AvatarImage
-                        src={user?.profile?.profilePhoto}
-                        alt="@shadcn"
-                      />
-                    </Avatar>
-                    <div>
-                      <h4 className="font-medium">{user?.fullname}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {user?.profile?.bio}
-                      </p>
-                    </div>
+              <PopoverContent className="w-72 p-4 shadow-xl rounded-xl bg-white border border-gray-200">
+                
+                {/* User Info */}
+                <div className="flex items-center gap-3 mb-4">
+                  <Avatar className="ring-2 ring-[#6A38C2]">
+                    <AvatarImage src={user?.profile?.profilePhoto} alt="profile" />
+                  </Avatar>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{user?.fullname}</h4>
+                    <p className="text-sm text-gray-500 line-clamp-1">
+                      {user?.profile?.bio || "No bio added"}
+                    </p>
                   </div>
                 </div>
-                <div className="flex flex-col my-2 text-gray-600">
-                  <div className="flex w-fit items-center gap-2 cursor-pointer">
-                    <User2 />
-                    <Button variant="link">
-                      {" "}
-                      <Link to="/profile">View Profile</Link>
-                    </Button>
-                  </div>
-                  <div className="flex w-fit items-center gap-2 cursor-pointer">
-                    <LogOutIcon />
-                    <Button onClick={logoutHandler} variant="link">
-                      Logout
-                    </Button>
-                  </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3 text-gray-700">
+                  {user?.role === "student" && (
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-2 hover:text-[#6A38C2] transition"
+                    >
+                      <User2 size={18} /> View Profile
+                    </Link>
+                  )}
+                  <button
+                    onClick={logoutHandler}
+                    className="flex items-center gap-2 hover:text-red-500 transition"
+                  >
+                    <LogOutIcon size={18} /> Logout
+                  </button>
                 </div>
               </PopoverContent>
             </Popover>

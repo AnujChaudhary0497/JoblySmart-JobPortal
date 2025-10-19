@@ -32,7 +32,7 @@ export const register = async (req, res) => {
       phoneNumber,
       password: hashedPassword,
       role,
-      profile:{
+      profile:{                
         profilePhoto:cloudResponse.secure_url,
       }
     });
@@ -122,14 +122,14 @@ export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
     const file = req.file;
-    //cloudinary......
+    //cloudinary..
     const fileUri = getDataUri(file);
     const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
     let skillsArray;
     if (skills) {
       skillsArray = skills.split(",");
-    }
+   }
     const userId = req.id; // middleware authentication
     let user = await User.findById(userId);
 
@@ -148,8 +148,8 @@ export const updateProfile = async (req, res) => {
     if (skills) user.profile.skills = skillsArray;
 
     //resume comes later here....
-    if (cloudResponse) {
-      user.profile.resume = cloudResponse.secret_url; // save the cloudinary url
+    if (cloudResponse) { 
+      user.profile.resume = cloudResponse.secure_url; 
       user.profile.resumeOriginalName = file.originalname; //Save the original file name
     }
     await user.save();
