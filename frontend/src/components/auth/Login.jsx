@@ -32,9 +32,7 @@ const Login = () => {
     try {
       dispatch(setLoading(true));
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
       if (res.data.success) {
@@ -74,8 +72,8 @@ const Login = () => {
             </Label>
             <Input
               type="email"
-              name="email"
               value={input.email}
+              name="email"
               onChange={changeEventHandler}
               placeholder="Enter your email"
               className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6A38C2] transition"
@@ -89,10 +87,10 @@ const Login = () => {
             </Label>
             <Input
               type="password"
-              name="password"
               value={input.password}
+              name="password"
               onChange={changeEventHandler}
-              placeholder="Enter your password"
+              placeholder="Enter password"
               className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6A38C2] transition"
               required
             />
@@ -154,12 +152,12 @@ const Login = () => {
           )}
 
           <p className="mt-6 text-center text-sm text-gray-600">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <Link
               to="/signup"
               className="text-[#6A38C2] hover:underline font-medium"
             >
-              Signup
+              Sign Up
             </Link>
           </p>
         </form>
