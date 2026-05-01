@@ -19,7 +19,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ✅ FIXED CORS (IMPORTANT)
 app.use(cors({
   origin: "*",
   credentials: true
@@ -33,20 +32,19 @@ app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
 
-// ✅ ROOT ROUTE (VERY IMPORTANT)
+// root route
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
 });
 
-// ================== FRONTEND SERVE ==================
+// frontend serve
 const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-app.get("*", (req, res) => {
+app.get("/*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
 });
-// ====================================================
 
 // server start
 app.listen(PORT, async () => {
