@@ -36,10 +36,13 @@ app.use("/api/v1/application", applicationRoute);
 // ===== FRONTEND SERVE =====
 const __dirname = path.resolve();
 
-// ✅ CORRECT PATH (IMPORTANT FIX)
 app.use(express.static(path.join(__dirname, "frontend/dist")));
 
-app.use((req, res) => {
+// ✅ FIXED (IMPORTANT)
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    return next(); // API ko backend pe jaane do
+  }
   res.sendFile(path.join(__dirname, "frontend/dist/index.html"));
 });
 // ==========================
