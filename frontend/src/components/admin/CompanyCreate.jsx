@@ -12,10 +12,17 @@ import { setSingleCompany } from "@/redux/companySlice";
 
 const CompanyCreate = () => {
   const navigate = useNavigate();
-  const [companyName, setCompanyName] = useState();
   const dispatch = useDispatch();
 
+  // ✅ FIX: default empty string
+  const [companyName, setCompanyName] = useState("");
+
   const registerNewCompany = async () => {
+    // ✅ validation
+    if (!companyName.trim()) {
+      return toast.error("Company name is required");
+    }
+
     try {
       const res = await axios.post(
         `${COMPANY_API_END_POINT}/register`,
@@ -27,20 +34,30 @@ const CompanyCreate = () => {
           withCredentials: true,
         }
       );
+
       if (res?.data?.success) {
         dispatch(setSingleCompany(res.data.company));
         toast.success(res.data.message);
+
         const companyId = res?.data?.company?._id;
-        navigate(`/admin/companies/${companyId}`);
+
+        // ✅ safe navigation
+        if (companyId) {
+          navigate(`/admin/companies/${companyId}`);
+        }
       }
     } catch (error) {
       console.log(error);
+      toast.error(
+        error?.response?.data?.message || "Something went wrong"
+      );
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white">
       <Navbar />
+
       <div className="max-w-3xl mx-auto px-6 py-12">
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold text-purple-700 mb-2">
@@ -56,11 +73,13 @@ const CompanyCreate = () => {
             <Label className="text-purple-700 text-sm font-medium">
               Company Name
             </Label>
+
             <Input
               type="text"
+              value={companyName} // ✅ controlled input
+              onChange={(e) => setCompanyName(e.target.value)}
               className="mt-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="JobHunt, Microsoft etc."
-              onChange={(e) => setCompanyName(e.target.value)}
             />
           </div>
 
@@ -72,6 +91,7 @@ const CompanyCreate = () => {
             >
               Cancel
             </Button>
+
             <Button
               className="bg-purple-600 hover:bg-purple-700 text-white"
               onClick={registerNewCompany}

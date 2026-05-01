@@ -27,6 +27,19 @@ const CompanySetup = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ FIXED: safe input update
+  useEffect(() => {
+    if (singleCompany) {
+      setInput({
+        name: singleCompany?.name || "",
+        description: singleCompany?.description || "",
+        website: singleCompany?.website || "",
+        location: singleCompany?.location || "",
+        file: null,
+      });
+    }
+  }, [singleCompany]);
+
   const ChangeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
@@ -38,17 +51,20 @@ const CompanySetup = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
     const formData = new FormData();
     formData.append("name", input.name);
     formData.append("description", input.description);
     formData.append("website", input.website);
     formData.append("location", input.location);
+
     if (input.file) {
       formData.append("file", input.file);
     }
 
     try {
       setLoading(true);
+
       const res = await axios.put(
         `${COMPANY_API_END_POINT}/update/${params.id}`,
         formData,
@@ -59,27 +75,27 @@ const CompanySetup = () => {
           withCredentials: true,
         }
       );
+
       if (res.data.success) {
         toast.success(res.data.message);
         navigate("/admin/companies");
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    setInput({
-      name: singleCompany.name || "",
-      description: singleCompany.description || "",
-      website: singleCompany.website || "",
-      location: singleCompany.location || "",
-      file: singleCompany.file || null,
-    });
-  }, [singleCompany]);
+  // ✅ EXTRA GUARD (no crash)
+  if (!singleCompany) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -106,9 +122,10 @@ const CompanySetup = () => {
                 name="name"
                 value={input.name}
                 onChange={ChangeEventHandler}
-                className="focus-visible:ring-2 focus-visible:ring-purple-500 mt-1"
+                className="mt-1"
               />
             </div>
+
             <div>
               <Label className="font-semibold">Description</Label>
               <Input
@@ -116,9 +133,10 @@ const CompanySetup = () => {
                 name="description"
                 value={input.description}
                 onChange={ChangeEventHandler}
-                className="focus-visible:ring-2 focus-visible:ring-purple-500 mt-1"
+                className="mt-1"
               />
             </div>
+
             <div>
               <Label className="font-semibold">Website</Label>
               <Input
@@ -126,9 +144,10 @@ const CompanySetup = () => {
                 name="website"
                 value={input.website}
                 onChange={ChangeEventHandler}
-                className="focus-visible:ring-2 focus-visible:ring-purple-500 mt-1"
+                className="mt-1"
               />
             </div>
+
             <div>
               <Label className="font-semibold">Location</Label>
               <Input
@@ -136,9 +155,10 @@ const CompanySetup = () => {
                 name="location"
                 value={input.location}
                 onChange={ChangeEventHandler}
-                className="focus-visible:ring-2 focus-visible:ring-purple-500 mt-1"
+                className="mt-1"
               />
             </div>
+
             <div className="col-span-2">
               <Label className="font-semibold">Logo</Label>
               <Input
@@ -151,14 +171,14 @@ const CompanySetup = () => {
           </div>
 
           {loading ? (
-            <Button className="w-full mt-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+            <Button className="w-full mt-6 bg-purple-500 text-white">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Please wait
             </Button>
           ) : (
             <Button
               type="submit"
-              className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:from-purple-700 hover:to-pink-600 transition-all"
+              className="w-full mt-6 bg-purple-600 text-white"
             >
               Update
             </Button>
