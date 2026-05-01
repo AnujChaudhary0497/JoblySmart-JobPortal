@@ -9,22 +9,25 @@ export const register = async (req, res) => {
       });
     }
 
-    // check user exist
-    const user = await User.findOne({ email });
-    if (user) {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).json({
-        message: "User already exist with this email.",
+        message: "User already exists",
         success: false,
       });
     }
 
     let profilePhoto = "";
 
-    // ✅ ONLY upload if file exists
-    if (req.file) {
-      const fileUri = getDataUri(req.file);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-      profilePhoto = cloudResponse.secure_url;
+    // ✅ SAFE CHECK
+    if (req.file && req.file.buffer) {
+      try {
+        const fileUri = getDataUri(req.file);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        profilePhoto = cloudResponse.secure_url;
+      } catch (err) {
+        console.log("Cloudinary error:", err);
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,12 +44,12 @@ export const register = async (req, res) => {
     });
 
     return res.status(201).json({
-      message: "Account created successfully.",
+      message: "Account created successfully",
       success: true,
     });
 
   } catch (error) {
-    console.log(error);
+    console.log("Register error:", error);
     return res.status(500).json({
       message: "Server error",
       success: false,
