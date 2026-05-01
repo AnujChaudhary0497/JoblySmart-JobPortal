@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS (safe for production)
+// CORS
 app.use(cors({
   origin: "*",
   credentials: true
@@ -33,20 +33,14 @@ app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
 
-// root route (health check)
-app.get("/", (req, res) => {
-  res.send("Backend running 🚀");
-});
-
 // ===== FRONTEND SERVE =====
 const __dirname = path.resolve();
 
-// static files
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// ✅ CORRECT PATH (IMPORTANT FIX)
+app.use(express.static(path.join(__dirname, "frontend/dist")));
 
-// fallback (IMPORTANT — no wildcard error)
 app.use((req, res) => {
-  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+  res.sendFile(path.join(__dirname, "frontend/dist/index.html"));
 });
 // ==========================
 
