@@ -19,12 +19,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS
-const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
-  credentials: true,
-};
-app.use(cors(corsOptions));
+// ✅ FIXED CORS (IMPORTANT)
+app.use(cors({
+  origin: "*",
+  credentials: true
+}));
 
 const PORT = process.env.PORT || 8000;
 
@@ -34,22 +33,23 @@ app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
 
+// ✅ ROOT ROUTE (VERY IMPORTANT)
+app.get("/", (req, res) => {
+  res.send("Backend running 🚀");
+});
 
 // ================== FRONTEND SERVE ==================
 const __dirname = path.resolve();
 
-// static files
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// react routing handle
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
+  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
 });
 // ====================================================
 
-
 // server start
-app.listen(PORT, () => {
-  connectDB();
+app.listen(PORT, async () => {
+  await connectDB();
   console.log(`Server running at port ${PORT}`);
 });
