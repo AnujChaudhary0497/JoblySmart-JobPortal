@@ -26,15 +26,13 @@ const ApplicantsTable = () => {
       const res = await axios.post(
         `${APPLICATION_API_END_POINT}/status/${id}/update`,
         { status },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       if (res.data.success) {
         toast.success(res.data.message);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -55,20 +53,24 @@ const ApplicantsTable = () => {
         <TableBody>
           {applicants &&
             applicants?.applications?.map((item) => (
-              <tr key={item._id}>
-                <TableCell>{item?.applicant?.fullname}</TableCell>
-                <TableCell>{item?.applicant?.email}</TableCell>
-                <TableCell>{item?.applicant?.phoneNumber}</TableCell>
+              <TableRow key={item?._id}>
+                <TableCell>{item?.applicant?.fullname || "-"}</TableCell>
+                <TableCell>{item?.applicant?.email || "-"}</TableCell>
+                <TableCell>{item?.applicant?.phoneNumber || "-"}</TableCell>
                 <TableCell className="text-blue-600 cursor-pointer">
                   <a
                     href={item?.applicant?.profile?.resume}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {item?.applicant?.profile?.resumeOriginalName}
+                    {item?.applicant?.profile?.resumeOriginalName || "-"}
                   </a>
                 </TableCell>
-                <TableCell>{item?.applicant.createdAt.split("T")[0]}</TableCell>
+                <TableCell>
+                  {item?.applicant?.createdAt
+                    ? item.applicant.createdAt.split("T")[0]
+                    : "-"}
+                </TableCell>
                 <TableCell className="float-right cursor-pointer">
                   <Popover>
                     <PopoverTrigger>
@@ -76,7 +78,6 @@ const ApplicantsTable = () => {
                     </PopoverTrigger>
                     <PopoverContent className="w-32">
                       {shortlistingStatus.map((status, index) => {
-                        // Use hover:text-green-600 or hover:text-red-600 based on status
                         const hoverColorClass =
                           status === "Accepted"
                             ? "hover:text-green-600"
@@ -95,7 +96,7 @@ const ApplicantsTable = () => {
                     </PopoverContent>
                   </Popover>
                 </TableCell>
-              </tr>
+              </TableRow>
             ))}
         </TableBody>
       </Table>

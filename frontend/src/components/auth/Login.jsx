@@ -31,17 +31,22 @@ const Login = () => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+
+      const res = await axios.post(
+        `${USER_API_END_POINT}/login`,
+        input,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         navigate("/");
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.log(error);
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
       dispatch(setLoading(false));
@@ -57,6 +62,7 @@ const Login = () => {
   return (
     <div>
       <Navbar />
+
       <div className="flex items-center justify-center max-w-7xl mx-auto min-h-[80vh] px-4">
         <form
           onSubmit={submitHandler}
@@ -66,14 +72,15 @@ const Login = () => {
             Login
           </h1>
 
+          {/* Email */}
           <div className="mb-5">
             <Label className="block mb-2 text-gray-700 font-semibold">
               Email
             </Label>
             <Input
               type="email"
-              value={input.email}
               name="email"
+              value={input.email}
               onChange={changeEventHandler}
               placeholder="Enter your email"
               className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6A38C2] transition"
@@ -81,14 +88,15 @@ const Login = () => {
             />
           </div>
 
+          {/* Password */}
           <div className="mb-5">
             <Label className="block mb-2 text-gray-700 font-semibold">
               Password
             </Label>
             <Input
               type="password"
-              value={input.password}
               name="password"
+              value={input.password}
               onChange={changeEventHandler}
               placeholder="Enter password"
               className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6A38C2] transition"
@@ -96,6 +104,7 @@ const Login = () => {
             />
           </div>
 
+          {/* Role */}
           <RadioGroup className="flex items-center justify-center gap-6 mb-6">
             <div className="flex items-center space-x-2">
               <Input
@@ -115,6 +124,7 @@ const Login = () => {
                 Student
               </Label>
             </div>
+
             <div className="flex items-center space-x-2">
               <Input
                 type="radio"
@@ -135,9 +145,10 @@ const Login = () => {
             </div>
           </RadioGroup>
 
+          {/* Button */}
           {loading ? (
             <Button
-              className="w-full py-3 bg-gradient-to-r from-[#6A38C2] to-[#F83002] text-white font-semibold shadow-lg hover:from-[#542c9e] hover:to-[#c1271e] transition flex justify-center items-center"
+              className="w-full py-3 bg-gradient-to-r from-[#6A38C2] to-[#F83002] text-white font-semibold shadow-lg flex justify-center items-center"
               disabled
             >
               <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Please wait
@@ -152,12 +163,12 @@ const Login = () => {
           )}
 
           <p className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{" "}
+            Don’t have an account?{" "}
             <Link
               to="/signup"
               className="text-[#6A38C2] hover:underline font-medium"
             >
-              Sign Up
+              Signup
             </Link>
           </p>
         </form>
