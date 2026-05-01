@@ -1,55 +1,58 @@
-export const register = async (req, res) => {
+export const login = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, password, role } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!fullname || !email || !phoneNumber || !password || !role) {
+    if (!email || !password || !role) {
       return res.status(400).json({
         message: "Something is missing",
         success: false,
       });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    let user = await User.findOne({ email });
+    if (!user) {
       return res.status(400).json({
-        message: "User already exists",
+        message: "Incorrect email or password",
         success: false,
       });
     }
 
-    let profilePhoto = "";
-
-    // ✅ SAFE CHECK
-    if (req.file && req.file.buffer) {
-      try {
-        const fileUri = getDataUri(req.file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-        profilePhoto = cloudResponse.secure_url;
-      } catch (err) {
-        console.log("Cloudinary error:", err);
-      }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Incorrect email or password",
+        success: false,
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (role !== user.role) {
+      return res.status(400).json({
+        message: "Role mismatch",
+        success: false,
+      });
+    }
 
-    await User.create({
-      fullname,
-      email,
-      phoneNumber,
-      password: hashedPassword,
-      role,
-      profile: {
-        profilePhoto,
-      },
-    });
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.SECRET_KEY,
+      { expiresIn: "1d" }
+    );
 
-    return res.status(201).json({
-      message: "Account created successfully",
-      success: true,
-    });
+    return res
+      .status(200)
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .json({
+        message: "Login successful",
+        success: true,
+        user,
+      });
 
   } catch (error) {
-    console.log("Register error:", error);
+    console.log("Login error:", error);
     return res.status(500).json({
       message: "Server error",
       success: false,
