@@ -14,20 +14,25 @@ dotenv.config();
 
 const app = express();
 
-// middleware
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS
-app.use(cors({
-  origin: "*",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
 const PORT = process.env.PORT || 8000;
 
-// API routes
+// Database
+connectDB();
+
+// API Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
@@ -36,23 +41,17 @@ app.use("/api/v1/application", applicationRoute);
 // ===== FRONTEND SERVE =====
 const __dirname = path.resolve();
 
-app.use(express.static(path.join(__dirname, "frontend/dist")));
+console.log("DIRNAME =", __dirname);
 
-// ✅ FIXED (IMPORTANT)
-app.use((req, res, next) => {
-  if (req.path.startsWith("/api")) {
-    return next(); // API ko backend pe jaane do
-  }
-  res.sendFile(path.join(__dirname, "frontend/dist/index.html"));
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "frontend", "dist", "index.html")
+  );
 });
-// ==========================
 
-// server start
-app.listen(PORT, async () => {
-  try {
-    await connectDB();
-    console.log(`Server running at port ${PORT}`);
-  } catch (error) {
-    console.error("DB connection failed:", error);
-  }
+// ===== SERVER =====
+app.listen(PORT, () => {
+  console.log(`Server running at port ${PORT}`);
 });
