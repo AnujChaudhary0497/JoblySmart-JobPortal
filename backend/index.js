@@ -21,7 +21,7 @@ app.use(cookieParser());
 // CORS
 app.use(
   cors({
-    origin: true,
+    origin: "https://jobly-smart-job-portal.vercel.app",
     credentials: true,
   })
 );
