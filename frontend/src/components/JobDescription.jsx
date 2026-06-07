@@ -4,34 +4,49 @@ import { Button } from "./ui/button";
 import { useParams } from "react-router-dom";
 import { setSingleJob } from "@/redux/jobSlice";
 import axios from "axios";
-import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from "@/utils/constant";
+import {
+  APPLICATION_API_END_POINT,
+  JOB_API_END_POINT,
+} from "@/utils/constant";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 const JobDescription = () => {
   const params = useParams();
   const jobId = params.id;
+
   const { singleJob } = useSelector((store) => store.job);
   const { user } = useSelector((store) => store.auth);
+
   const dispatch = useDispatch();
 
   const applyJobHandler = async () => {
     try {
-      const res = await axios.get(`${APPLICATION_API_END_POINT}/apply/${jobId}`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${APPLICATION_API_END_POINT}/apply/${jobId}`,
+        {
+          withCredentials: true,
+        }
+      );
 
       if (res.data.success) {
         setIsApplied(true);
+
         const updatedJob = {
           ...singleJob,
-          applications: [...singleJob.applications, { applicant: user?._id }],
+          applications: [
+            ...singleJob.applications,
+            { applicant: user?._id },
+          ],
         };
+
         dispatch(setSingleJob(updatedJob));
         toast.success(res.data.message);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something went wrong.");
+      toast.error(
+        error?.response?.data?.message || "Something went wrong."
+      );
     }
   };
 
@@ -39,24 +54,33 @@ const JobDescription = () => {
     singleJob?.applications?.some(
       (app) => app.applicant === user?._id
     ) || false;
+
   const [isApplied, setIsApplied] = useState(isInitiallyApplied);
 
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, {
-          withCredentials: true,
-        });
+        const res = await axios.get(
+          `${JOB_API_END_POINT}/get/${jobId}`,
+          {
+            withCredentials: true,
+          }
+        );
+
         if (res.data.success) {
           dispatch(setSingleJob(res.data.job));
+
           setIsApplied(
-            res.data.job.applications.some((app) => app.applicant === user?._id)
+            res.data.job.applications.some(
+              (app) => app.applicant === user?._id
+            )
           );
         }
       } catch (err) {
         console.error(err);
       }
     };
+
     fetchJob();
   }, [jobId, dispatch, user?._id]);
 
@@ -68,13 +92,17 @@ const JobDescription = () => {
             <h1 className="text-2xl font-bold text-gray-800 mb-2">
               {singleJob?.title}
             </h1>
+
             <div className="flex flex-wrap gap-2">
               <Badge className="bg-blue-50 text-blue-700 font-medium">
-                {singleJob?.position} Position{singleJob?.position > 1 ? "s" : ""}
+                {singleJob?.position} Position
+                {singleJob?.position > 1 ? "s" : ""}
               </Badge>
+
               <Badge className="bg-red-50 text-red-600 font-medium">
                 {singleJob?.jobType}
               </Badge>
+
               <Badge className="bg-purple-50 text-purple-700 font-medium">
                 {singleJob?.salary} LPA
               </Badge>
@@ -94,39 +122,87 @@ const JobDescription = () => {
           </Button>
         </div>
 
-        {/* Improved Details Section */}
+        {/* Details */}
         <div className="mt-8 border-t border-gray-300 pt-6 space-y-5 text-gray-800 text-base leading-relaxed">
-          <div className="flex">
-            <span className="w-32 font-semibold text-gray-900">Role:</span>
+          
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Role:
+            </span>
             <span>{singleJob?.title || "N/A"}</span>
           </div>
-          <div className="flex">
-            <span className="w-32 font-semibold text-gray-900">Location:</span>
+
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Location:
+            </span>
             <span>{singleJob?.location || "Not Specified"}</span>
           </div>
-          <div className="flex">
-            <span className="w-32 font-semibold text-gray-900">Description:</span>
-            <p className="flex-1 mt-0 text-gray-700 whitespace-pre-line">{singleJob?.description || "N/A"}</p>
+
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Description:
+            </span>
+            <p className="flex-1 text-gray-700 whitespace-pre-line">
+              {singleJob?.description || "N/A"}
+            </p>
           </div>
-          <div className="flex">
-            <span className="w-32 font-semibold text-gray-900">Experience:</span>
+
+          {/* Requirements Section */}
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Requirements:
+            </span>
+
+            <div className="flex-1">
+              {singleJob?.requirements?.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                  {singleJob.requirements.map((req, index) => (
+                    <li key={index}>{req}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span>Not Specified</span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Experience:
+            </span>
+
             <span>
               {singleJob?.experienceLevel
-                ? `${singleJob.experienceLevel} year${singleJob.experienceLevel > 1 ? "s" : ""}`
+                ? `${singleJob.experienceLevel} year${
+                    singleJob.experienceLevel > 1 ? "s" : ""
+                  }`
                 : "Not Specified"}
             </span>
           </div>
-          <div className="flex">
-            <span className="w-32 font-semibold text-gray-900">Salary:</span>
+
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Salary:
+            </span>
             <span>{singleJob?.salary} LPA</span>
           </div>
-          <div className="flex">
-            <span className="w-32 font-semibold text-gray-900">Total Applicants:</span>
+
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Total Applicants:
+            </span>
             <span>{singleJob?.applications?.length || 0}</span>
           </div>
-          <div className="flex">
-            <span className="w-32 font-semibold text-gray-900">Posted Date:</span>
-            <span>{singleJob?.createdAt?.split("T")[0] || "N/A"}</span>
+
+          <div className="flex flex-col sm:flex-row">
+            <span className="sm:w-32 font-semibold text-gray-900">
+              Posted Date:
+            </span>
+
+            <span>
+              {singleJob?.createdAt?.split("T")[0] || "N/A"}
+            </span>
           </div>
         </div>
       </div>
