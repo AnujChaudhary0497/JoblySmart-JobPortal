@@ -68,7 +68,7 @@ export default function Footer() {
         © {new Date().getFullYear()}{" "}
         <span className="font-medium text-gray-700">JoblySmart</span>. All rights reserved.
         <p className="mt-1 text-xs">
-          Designed by{" "}
+          Designed and Developed by{" "}
           <span className="text-[#6A38C2] font-semibold">Anuj Chaudhary</span>
         </p>
       </div>
