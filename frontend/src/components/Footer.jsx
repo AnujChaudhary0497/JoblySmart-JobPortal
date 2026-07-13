@@ -74,7 +74,7 @@ export default function Footer() {
         . All rights reserved.
 
         <p className="mt-1 text-xs">
-          Built with ❤️ by{" "}
+          Design and Developed by{" "}
           <span className="text-[#6A38C2] font-semibold">
             Anuj Chaudhary
           </span>
